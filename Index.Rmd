@@ -1,0 +1,67 @@
+---
+title: "Index"
+author: "Jeffrey Schmidt"
+date: "2022-10-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Step 1: Load packages
+
+```{r}
+library(viridis)
+library(sf)
+library(rworldmap)
+library(rgeos)
+library(ggdendro)
+library(dplyr)
+library(sf)
+library(tigris)
+library(ggplot2)
+library(plotly)
+library(htmlwidgets)
+```
+**Source and About the Data**
+The following data was obtained from the US Bureau of Economic analysis (link below), and is the percentage of total compensation within each state that was made up by recreation in 2020.
+https://www.bea.gov/data/special-topics/outdoor-recreation
+
+**Approach and Design**
+In this I was looking to communicate how large of a part recreation played in each state's economy for that fiscal year, and found the above metric to be most suitable as it is directly tied to income. 
+
+To represent this I used choropleth map of the US with a wide range of colors to ultimately parse out the differences from state to state. To enable further analysis, I have also made the map interactive so we can see the respective percentages for each state.
+
+**Interpretation**
+What can be seen below is that much of the Mountain West appears to be above the national average in terms of reliance on recreation, although there are a couple of exceptions, notable Maine, Vermont and Florida. 
+
+```{r}
+#pull in data
+
+rec<-read.csv("Recreation-State.csv")
+#head(rec)
+
+#pair data with map
+recreation <- map_data("state")%>%
+  left_join(rec, by = c("region" = "X"))
+```
+
+
+```{r}
+#create chloropleth map using gg tools
+plot_rec <- ggplot(data = recreation, mapping = aes(x = long, y = lat, group = group, fill = Percent_TotalComp, text = paste("% of State Total:", round(Percent_TotalComp,1), sep = " "))) +
+  geom_polygon(color = "White")+
+  ggdendro::theme_dendro() +
+  scale_fill_viridis(option="magma", direction=-1)+
+  ggtitle("Recreation as Percent of Total State Employee Compensation in 2020")+
+  labs(fill = "Percent \nState Total \nCompensation")
+
+
+#use plotly to make interactive
+plot_rec_plotly <- ggplotly(plot_rec, tooltip = "text")
+
+#show map
+plot_rec_plotly 
+```
+
