@@ -54,14 +54,27 @@ plot_rec <- ggplot(data = recreation, mapping = aes(x = long, y = lat, group = g
   geom_polygon(color = "White")+
   ggdendro::theme_dendro() +
   scale_fill_viridis(option="magma", direction=-1)+
-  ggtitle("Recreation as Percent of Total State Employee Compensation in 2020")+
-  labs(fill = "Percent \nState Total \nCompensation")
+  ggtitle("Recreation as Percent of Total Employee Compensation in 2020")+
+  labs(fill = "Percent \nTotal State \nCompensation")+
+  coord_map()
+plot_rec
 
+```
 
+```{r}
+#create chloropleth map using gg tools
+plot_rec <- ggplot(data = recreation, mapping = aes(x = long, y = lat, group = group, fill = Percent_TotalComp, text = paste("% of State Total:", round(Percent_TotalComp,1), sep = " "))) +
+  geom_polygon(color = "White")+
+  ggdendro::theme_dendro() +
+  scale_fill_viridis(option="magma", direction=-1)+
+  ggtitle("Recreation as Percent of Total Employee Compensation in 2020")+
+  labs(fill = "Percent \nTotal State \nCompensation")
+  
 #use plotly to make interactive
 plot_rec_plotly <- ggplotly(plot_rec, tooltip = "text")
 
 #show map
 plot_rec_plotly 
 ```
+
 
